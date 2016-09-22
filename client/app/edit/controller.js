@@ -2,6 +2,8 @@
  *                           Copyright 2016 Chuan Ji                         *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+/* global Base64 */
+
 import Ember from 'ember';
 import StorageType from '../utils/storage-type';
 
@@ -115,7 +117,7 @@ export default Ember.Controller.extend({
       Ember.$('#reopen-dialog').modal('hide');
       this.send('open', storageType.toString(), true);
     },
-    download() {
+    saveLocal() {
       var fileName = this.get('model.fileName');
       var blob = new Blob([this.get('model.body')], { type: 'text/plain' });
       this.downloadBlob(fileName, blob);
@@ -125,6 +127,23 @@ export default Ember.Controller.extend({
       var compiledBodyForDownload = this.get('model.compiledBodyForDownload');
       var blob = new Blob([compiledBodyForDownload], { type: 'text/html' });
       this.downloadBlob(fileName, blob);
+    },
+    openLocal(ev) {
+      var file = ev.target.files[0];
+      console.info('Opening local file: %o', file);
+      var reader = new FileReader();
+      reader.onload = function(ev) {
+        var blob = new Blob([ev.target.result], { type: 'text/plain' });
+        var blobUrl = URL.createObjectURL(blob);
+        console.info('Got blob URL: %s', blobUrl);
+        var path = Base64.encode(JSON.stringify({
+          'name': file.name,
+          'url': blobUrl
+        }));
+        // TODO: Implement this.
+        this.transitionToRoute('edit', StorageType.NONE, path);
+      }.bind(this);
+      reader.readAsText(file);
     }
   },
 

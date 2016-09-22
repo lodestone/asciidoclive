@@ -2,6 +2,8 @@
  *                           Copyright 2016 Chuan Ji                         *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+/* global $ */
+
 import Ember from 'ember';
 
 export default Ember.Controller.extend({
@@ -77,6 +79,14 @@ export default Ember.Controller.extend({
   isFontModalVisible: false,
   isEditorModeModalVisible: false,
 
+  bindLocalFileSelected: Ember.on('init', function() {
+    Ember.run.scheduleOnce('afterRender', this, function() {
+      $('#open-local-file-input').change(function() {
+        this.sendToHeaderActionHandler('openLocal', arguments);
+      }.bind(this));
+    });
+  }),
+
   actions: {
     open() {
       this.sendToHeaderActionHandler('open', arguments);
@@ -114,8 +124,8 @@ export default Ember.Controller.extend({
     showEditorModeModal() {
       this.set('isEditorModeModalVisible', true);
     },
-    download() {
-      this.sendToHeaderActionHandler('download', arguments);
+    saveLocal() {
+      this.sendToHeaderActionHandler('saveLocal', arguments);
     },
     downloadHtml() {
       this.sendToHeaderActionHandler('downloadHtml', arguments);
